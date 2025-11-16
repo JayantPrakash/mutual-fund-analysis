@@ -14,7 +14,7 @@ class EnhancedSIP:
     def __init__(self):
         self.fetcher = MutualFundFetcher()
     
-    def analyze_nav_trends(self, scheme_code: str, days: int = 365) -> pd.DataFrame:
+    def analyze_nav_trends(self, scheme_code: str, days: int = 600) -> pd.DataFrame:
         """
         Analyze NAV trends for a mutual fund scheme
         
@@ -49,8 +49,8 @@ class EnhancedSIP:
         return df
     
     def find_best_investment_dates(self, scheme_code: str, 
-                                   drop_threshold: float = -0.2,
-                                   days: int = 180) -> List[Dict]:
+                                   drop_threshold: float = -2,
+                                   days: int = 600) -> List[Dict]:
         """
         Find the best dates to invest based on NAV drops
         
@@ -78,7 +78,8 @@ class EnhancedSIP:
         
         # Prepare results
         results = []
-        for _, row in opportunities.head(10).iterrows():
+        #for _, row in opportunities.head(10).iterrows():
+        for _, row in opportunities.iterrows():
             results.append({
                 'date': row['date'].strftime('%d-%m-%Y'),
                 'nav': round(row['nav'], 2),
@@ -162,7 +163,7 @@ class EnhancedSIP:
             return "Market is stable - Continue regular SIP"
     
     def search_and_analyze(self, fund_name: str, 
-                          drop_threshold: float = -0.2) -> Optional[Dict]:
+                          drop_threshold: float = -2) -> Optional[Dict]:
         """
         Search for a fund and provide enhanced SIP analysis
         
@@ -197,10 +198,10 @@ class EnhancedSIP:
         # Get best investment dates
         print(f"\n📊 Best Investment Opportunities (NAV drops > {abs(drop_threshold)}%):")
         print("-" * 80)
-        best_dates = self.find_best_investment_dates(scheme_code, drop_threshold)
+        best_dates = self.find_best_investment_dates(scheme_code, drop_threshold=-2)
         
         if best_dates:
-            for i, opportunity in enumerate(best_dates[:5], 1):
+            for i, opportunity in enumerate(best_dates, 1):
                 print(f"\n{i}. Date: {opportunity['date']}")
                 print(f"   NAV: ₹{opportunity['nav']}")
                 print(f"   Drop: {opportunity['nav_change_percent']}%")
